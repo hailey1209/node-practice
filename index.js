@@ -60,85 +60,95 @@ app.use('/users/:uname/books', function(req, res, next){
 //현재 사용자의 전체 도서 목록 조회
 app.get('/users/:uname/books', function(req, res, next){
     if(req.params.uname == "홍길동"){
-        console.log(req.params.uname)
-        console.log(books.홍길동)
         req.books = books.홍길동
-        // console.log(req.books)
         res.send({user: `${req.user}`, book: `${req.books}`})
-        next('route')
+        next()
     }else if(req.params.uname == "김철수"){
-        console.log(req.params.uname)
-        console.log(books.김철수)
         req.books = books.김철수
         res.send({user: `${req.user}`, book: `${req.books}`})
-        next('route')
+        next()
     }else if(req.params.uname =="김영희"){
-        console.log(req.params.uname)
-        console.log(books.김영희)
         req.books = books.김영희
         res.send({user: `${req.user}`, book: `${req.books}`})
-        next('route')
+        next()
     }else next()
 })
 
 //현재 사용자의 도서목록에 특정 도서 추가
 app.post('/users/:uname/books', function(req, res, next){
     if(req.params.uname == '홍길동'){
-        console.log(req.query.book)
         req.addBook = req.query.book
         books.홍길동.push(req.addBook)
-        res.send(books.홍길동)
-        // console.log(res)
-        next('route')
-
+        res.send({book: `${books.홍길동}`})
+        next()
     }else if(req.params.uname == '김영희'){
         console.log(req.query.book)
         req.addBook = req.query.book
         books.김영희.push(req.addBook)
-        res.send(books.김영희)
-        // console.log(res)
-        next('route')
-
+        res.send({book: `${books.김영희}`})
+        next()
     }else if(req.params.uname == '김철수'){
         console.log(req.query.book)
         req.addBook = req.query.book
         books.김철수.push(req.addBook)
-        res.send(books.김철수)
-        // console.log(res)
-        next('route')
-    }else
-    next()
+        res.send({book: `${books.김철수}`})
+        next()
+    }
+    else next()
 })
 
-//현재 사용자의 특정 도서 조회
+// 현재 사용자의 특정 도서 조회
 app.get('/users/:uname/books/:name', function(req, res, next){
-    for(let i=0; i<books.김영희.length; i++){
+    for(let i=0; i<books["김영희"].length; i++){
         if(req.params.uname == "김영희"){
             req.book = req.params.name
            return res.send({book: `${req.book}`})
         }
-        next('route')
+        else next()
     }
-    for(let i=0; i<books.김철수.length; i++){
+    for(let i=0; i<books["김철수"].length; i++){
         if(req.params.uname == "김철수"){
             req.book = req.params.name
             return res.send({book: `${req.book}`})
         }
-        next('route')
+        else next()
     }
-    for(let i=0; i<books.홍길동.length; i++){
+    for(let i=0; i<books["홍길동"].length; i++){
         if(req.params.uname == "홍길동"){
             req.book = req.params.name
             return res.send({book: `${req.book}`})
         }
-        next('route')
+        else next()
     }
     next()
 })
 
 // // 현재 사용자의 특정 도서내용 변경
-app.put('/users/:uname/books/:name?book=apple', function(req, res, next){
- 
+app.put('/users/:uname/books/:name', function(req, res, next){
+    for(let i=0; i<books["홍길동"].length; i++){
+        if(req.params.name == "홍길동"){
+            req.change = req.query.book
+            books.홍길동.splice(books["홍길동"].indexOf(`${req.params.name}`), 1, `${req.change}`)
+            return res.send({book: `${books["홍길동"]}`})
+        }
+        else next()
+    }
+    for(let i=0; i<books["김철수"].length; i++){
+        if(req.params.name = "김철수"){
+            req.change = req.query.book
+            books.김철수.splice(books["김철수"].indexOf(`${req.params.name}`), 1, `${req.change}`)
+            return res.send({book: `${books["김철수"]}`})
+        }
+        else next()
+    }
+    for(let i=0; i<books["김영희"].length; i++){
+        if(req.params.name == "김영희"){
+            req.change = req.query.book
+            books.김영희.splice(books["김영희"].indexOf(`${req.params.name}`), 1, `${req.change}`)
+            return res.send({book: `${books["김영희"]}`})
+        }
+        else next()
+    }
     next()
 })
 
