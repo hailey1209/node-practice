@@ -4,10 +4,14 @@ const { Schema } = mongoose
 const { Types: {ObjectId} } = Schema
 
 const bookSchema = new Schema({
-    category: {
+    lentBy:{
         type: ObjectId,
         required: true,
         ref: 'User',
+    },
+    category: {
+        type: String,
+        required: true,
     },
     title:{
         type: String,
@@ -22,10 +26,6 @@ const bookSchema = new Schema({
         type: String,
         required: true,
     },
-    lentBy:{
-        type: String,
-        required: true,
-    },
     lentAt: {
         type: Date,
         default: Date.now,
@@ -34,6 +34,10 @@ const bookSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    lastUpdated: {
+        type: Date,
+        default: Date.now,
+    }
 })
 
 const Book = mongoose.model('Book', bookSchema)
