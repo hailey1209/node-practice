@@ -9,6 +9,9 @@ const mongoose = require('mongoose')
 const axios = require('axios')
 // const book = require('./src/models/Book')
 // const user = require('./src/models/User')
+const usersRouter = require('./src/routes/users')
+const booksRouter = require('./src/routes/books')
+const config = require('./config')
 const books = {"홍길동" : ["가나다", "라마바사", "아자차"], 
                "김철수": ["ABC", "DEF","HGT"],
                "김영희": ["해리포터", "아기돼지 삼형제"]}
@@ -21,8 +24,7 @@ const corsOptions = {
 }
 
 // mongo db 연결
-const CONNECT_URL = 'mongodb://127.0.0.1:27017/hailey'
-mongoose.connect(CONNECT_URL)
+mongoose.connect(config.MONGODB_URL)
 .then(()=> console.log('mongo db connected...'))
 .catch(e => console.log(`failed to connect mongo db: ${e}`))
 
@@ -35,6 +37,8 @@ app.get('/fetch', async(req, res)=> {
 app.use(cors(corsOptions))
 app.use(express.json()) //request body 파싱
 app.use(logger('tiny'))// Logger 설정
+app.use('/api/users', usersRouter)
+app.use('/api/books', booksRouter)
 
 app.get('/hello', (req, res)=> {
     res.json('hello world!')
