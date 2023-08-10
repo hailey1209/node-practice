@@ -3,6 +3,8 @@ const Books = require('../models/Book')
 const expressAsyncHandler = require('express-async-handler')
 const { isAuth } = require('../../auth')
 const Book = require('../models/Book')
+const mongoose = require('mongoose') //추가
+const { Types: {ObjectId}} = mongoose //추가
 
 const router = express.Router()
 
@@ -105,4 +107,94 @@ router.delete('/:id', isAuth, expressAsyncHandler(async (req, res, next)=> {
     }
 }))
 
+//어드민 페이지, 필드명 기준으로 데이터 그룹화
+router.get('/group/:field', isAuth, expressAsyncHandler(async (req, res, next)=> {
+    //로그인한 사용자가 관리자 권한이 있으면 데이터를 보여줌
+    if(!req.user.isAdmin){
+        res.status(401).json( { code: 401, message: '관리자 권한이 없습니다.'})
+    }else{
+        const documents = await Book.aggregate([
+            {
+                $group: {
+                    _id: `$${req.params.field}`,
+                    count: { $sum: 1 }
+                }
+            }
+        ])
+
+        console.log(`Number of group: ${documents.length}`) //그룹갯수
+        documents.sort((doc1, doc2) => doc1._id - doc2._id) //도큐먼트 오름차순 정렬
+        res.json ( {code: 200, documents})
+    }
+}))
+
+//일반 사용자 페이지, 필드명 기준으로 그룹화
+router.get('/group/mine/:field', isAuth, expressAsyncHandler(async (req, res, next)=> {
+    const documents = await Book.aggregate([
+        { $match: {lentBy: new ObjectId(req.user._id)}},
+        {
+            $group: {
+                _id: `$${req.params.field}`,
+                count: {$sum: 1}
+            }
+        }
+    ])
+
+    console.log(`Number of group: ${documents.length}`)
+    documents.sort((doc1, doc2) => doc1._id - doc2._id)
+    res.json({code: 200, documents})
+}))
+
+//어드민 페이지, 날짜별 그룹화
+router.get('/group/date/:field', isAuth, expressAsyncHandler( async (req, res, next) => {
+    if(!req.user.isAdmin){
+        res.status(401).json( {code: 401, message: '관리자 권한이 없습니다.'})
+    }else{
+        if(req.params.field === 'lentAt' 
+        || req.params.field === 'returnAt' 
+        || req.params.field === 'lastUpdated'){
+            const documents = await Book.aggregate([
+                {$group: 
+                    {
+                        _id: { Year: {$year: `$${req.params.field}`}, Month: {$month: `$${req.params.field}`}},
+                        count: {$sum: 1}
+                    }
+                }
+            ])
+    
+            console.log(`Number of group: ${documents.length}`)
+            documents.sort((doc1, doc2) => doc1._id - doc2._id)
+            res.json({code: 200, documents})
+        }else{
+            res.status(204).json( {code: 204, message: 'No content'})
+        }
+    }
+}))
+
+//사용자 페이지, 날짜별 그룹화
+router.get('/group/mine/date/:field', isAuth, expressAsyncHandler(async (req, res, next)=> {
+    if(req.params.field === 'lentAt' 
+    || req.params.field === 'returnAt' 
+    || req.params.field === 'lastUpdated'){
+        const documents = await Book.aggregate([
+            {
+                $match: { author: new ObjectId(req.user._id)}
+            },
+            {$group: 
+                {
+                    _id: { Year: {$year: `$${req.params.field}`},
+                           Month: {$month: `$${req.params.field}`}
+                         },
+                    count: {$sum: 1}
+                }
+            }
+        ])
+
+        console.log(`Number of group: ${documents.length}`)
+        documents.sort((doc1, doc2) => doc1._id - doc2._id)
+        res.json({code: 200, documents})
+    }else{
+        res.status(204).json( {code: 204, message: 'No content'})
+    }
+}))
 module.exports = router

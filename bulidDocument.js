@@ -5,7 +5,7 @@ const config = require('./config')
 
 //랜덤 더미 데이터 생성을 위한 도서 카테고리, 대출상태
 const category = ['자기개발', '교육', '과학', '요리', '여행', '언어', '취미', '소설', '수필', '경제']
-const status = ['대출', '반납']
+const status = [true, false]
 let users = []
 
 //데이터 베이스 연결
@@ -56,14 +56,14 @@ const createBooks = async (n, user) => {
     for(let i=0; i<n; i++){
         const book = new Book({
             lentBy: user._id,
-            category: randomString(5),
+            category: selectRandomValue(category),
             imgURL: `https://www.${randomString(7)}.com/${randomString(10)}.png`,
             title: randomString(10),
             author: randomString(6),
             status: selectRandomValue(status),
-            lentAt: randomDate(new Date(2023, 1, 1), new Date()),
-            returnAt: randomDate(new Date(2023, 1, 1), new Date()),
-            lastUpdated: randomDate(new Date(2023, 1, 1), new Date())
+            lentAt: randomDate(new Date(2023, 5, 1), new Date()),
+            returnAt: randomDate(new Date(2023, 5, 1), new Date()),
+            lastUpdated: randomDate(new Date(2023, 5, 1), new Date())
         })
         await book.save()
     }
@@ -71,9 +71,9 @@ const createBooks = async (n, user) => {
 
 //사용자, 해당 사용자의 책 리스트 순서대로 생성
 const createData = async (users) => {
-    users = await createUsers(10, users)
+    users = await createUsers(5, users)
     users.forEach(user => {
-        createBooks(20, user)
+        createBooks(15, user)
     });
 }
 
