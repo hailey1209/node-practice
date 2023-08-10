@@ -9,7 +9,7 @@ const router = express.Router()
 
 //해당 사용자 기준 전체 책 목록 조회
 router.get('/', isAuth, expressAsyncHandler(async (req, res, next)=> {
-    const books =await Books.find({lentBy: req.user._id}) //req.user => isAuth에서 전달된 값
+    const books =await Books.find({lentBy: req.user._id}).populate('lentBy') //req.user => isAuth에서 전달된 값
     if(books.length === 0 ){
         res.status(404).json( {code: 404, message: 'Failed to find books!!'})
     }else{
@@ -36,6 +36,7 @@ router.post('/', isAuth, expressAsyncHandler(async (req, res, next)=> {
     const searchedBook = await Books.findOne({
         lentBy: req.user._id,
         category: req.body.category,
+        imgURL: req.body.imgURL, //추가
         title: req.body.title,
         author: req.body.author,
         status: req.body.status,
@@ -70,6 +71,8 @@ router.put('/:id',isAuth, expressAsyncHandler(async (req, res, next)=> {
     if(!book){
         res.status(404).json({code: 404, message: 'Book is not founded'})
     }else{
+        book.imgURL = req.body.imgURL || book.imgURL //추가
+        book.category = req.body.category || book.category //추가
         book.title = req.body.title || book.title
         book.author = req.body.author || book.author
         book.status = req.body.status || book.status

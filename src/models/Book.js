@@ -12,6 +12,12 @@ const bookSchema = new Schema({
     category: {
         type: String,
         required: true,
+        trim: true //추가
+    },
+    imgURL: { //추가
+        type: String,
+        required: true,
+        trim: true
     },
     title:{
         type: String,

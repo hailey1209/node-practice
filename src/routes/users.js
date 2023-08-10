@@ -64,6 +64,7 @@ router.put('/:id', isAuth, expressAsyncHandler(async (req, res, next)=> {
         user.name = req.body.name || user.name //사용자의 이름 값이 변경이되어서 요청이 들어오면 그 값을 저장하고 요청이 없다면 기존의 값을 저장
         user.email = req.body.email || user.email
         user.password = req.body.password || user.password
+        user.lastModifiedAt = new Date() //수정시각 업데이트(추가)
         const updatedUser = await user.save() //변경된 사용자의 정보를 db에 저장
         const {name, email, userId, isAdmin, createdAt} =updatedUser // 업데이트된 정보를 updatedUser 객체에 저장
         res.json({

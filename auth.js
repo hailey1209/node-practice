@@ -29,9 +29,10 @@ const isAuth = (req, res, next) => {
                 res.status(419).json({ code: 419, message: 'Token has been expired!'})
             }else if(err){
                 res.status(401).json({code: 401, message: 'Invailed token!'})
+            }else{
+                req.user = userInfo
+                next()
             }
-            req.user = userInfo
-            next()
         })
     }
 }
